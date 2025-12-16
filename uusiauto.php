@@ -1,52 +1,45 @@
 <?php
-$apiUrl = "http:/localhost/autot_api/autot_api.php";
+$apiUrl = "https://tvt-linux.tvtedu.fi/~213582/autot_api.php";
 
-if(isset($_POST['add'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
         "merkki" => $_POST['merkki'],
         "malli" => $_POST['malli'],
-        "vuosimalli" => intval($_POST['vuosimalli'])
+        "vuosimalli" => (int)$_POST['vuosimalli']
     ];
 
     $ch = curl_init($apiUrl);
-    
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-
-    curl_setopt($ch, CURLOPT_POST, true);
-
-    $response = curl_exec($ch);
-
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS => json_encode($data),
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json']
+    ]);
+    curl_exec($ch);
     curl_close($ch);
 
-    if($httpCode === 201 || $httpCode === 200) {
-        header("Location: index.php?status=added");
-    } else {
-        header("Location: index.php?status=add_error");
-    }
+    header("Location: index.php?status=added");
     exit;
 }
 ?>
-
 <!DOCTYPE html>
-<html lang="fi">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Lisää uusi auto</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h2>Lisää uusi auto</h2>
-    <form method = "post">
-        <input type="text" name="merkki" placeholder="Merkki">
-        <input type="text" name="malli" placeholder="Malli">
-        <input type="number" name="vuosimalli" placeholder="Vuosimalli">
-        <button type="submit" name="add">Lisää</button>
-    </form>    
+<div class="container">
+<h1>Add a new car</h1>
+
+<form method="post">
+<input name="merkki" placeholder="Character" required>
+<input name="malli" placeholder="Model" required>
+<input type="number" name="vuosimalli" placeholder="Model year" required>
+<button>Add</button>
+</form>
+
+<a class="btn-secondary" href="index.php">Back</a>
+</div>
 </body>
 </html>
